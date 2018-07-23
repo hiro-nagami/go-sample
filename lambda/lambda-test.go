@@ -12,4 +12,4 @@ func HandleRequest(ctx context.Context, params interface{}) (interface{}, error)
 
 func main() {
     lambda.Start(HandleRequest)
-}`
+}
