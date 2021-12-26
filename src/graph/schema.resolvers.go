@@ -4,18 +4,17 @@ package graph
 // will be copied through when generating and any unknown code will be moved to the end.
 
 import (
+	"app/graph/generated"
+	"app/graph/model"
 	"context"
 	"fmt"
 	"math/rand"
-
-	"app/graph/generated"
-	"app/graph/model"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
 	todo := &model.Todo{
-		Text:   input.Text,
-		ID:     fmt.Sprintf("T%d", rand.Int()),
+		Text: input.Text,
+		ID:   fmt.Sprintf("T%d", rand.Int()),
 		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
 	}
 	r.todos = append(r.todos, todo)
