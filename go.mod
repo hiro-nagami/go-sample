@@ -1,4 +1,4 @@
-module github.com/hiro-nagami/sample-go
+module app
 
 go 1.17
 
