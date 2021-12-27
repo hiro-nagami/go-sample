@@ -1,6 +1,6 @@
 create table todos
 (
-    id integer not null,
+    id SERIAL not null,
     title text not null,
     done boolean,
     user_id integer not null,
@@ -9,7 +9,7 @@ create table todos
 
 create table users
 (
-    id integer not null,
+    id SERIAL not null,
     name varchar not null,
     PRIMARY KEY (id)
 );

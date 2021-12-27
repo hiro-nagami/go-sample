@@ -3,35 +3,22 @@ package main
 import (
     "log"
     "net/http"
-    "os"
-    "database/sql"
-    "fmt"
 
-    _ "github.com/lib/pq"
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
     "app/graph/generated"
 	"app/graph"
+    "app/utils"
 )
 
 
 const defaultPort = "8080"
 
 func main() {
-    var connectionString string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=require", mustGet("POSTGRES_HOST"), mustGet("POSTGRES_USER"), mustGet("POSTGRES_PASSWORD"), mustGet("POSTGRES_DB"))
-    db, err := sql.Open("postgres", connectionString)
-    defer db.Close()
 
-    if err != nil {
-        fmt.Println(err)
-    }
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
+	port := utils.MustGet("PORT")
 
     router := chi.NewRouter()
     router.Use(middleware.Logger)
@@ -52,12 +39,4 @@ func main() {
 
     log.Printf("connect to http://0.0.0.0:%s/ for GraphQL playground", port)
     log.Fatal(http.ListenAndServe(":"+port, router))
-}
-
-func mustGet(arg string) string{
-    env := os.Getenv(arg)
-    if env == ""{
-        panic("env not found")
-    }
-    return env
 }
