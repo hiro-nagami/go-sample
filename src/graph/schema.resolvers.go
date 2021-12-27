@@ -6,22 +6,29 @@ package graph
 import (
 	"app/graph/generated"
 	"app/graph/model"
+	"app/utils/database"
 	"context"
-	"fmt"
-	"math/rand"
+	"log"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
-		Text: input.Text,
-		ID:   fmt.Sprintf("T%d", rand.Int()),
-		User: &model.User{ID: input.UserID, Name: "user " + input.UserID},
+func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (string, error) {
+	var todo_id string
+	db, _ := database.SetupDatabase()
+
+	// log.Printf("Title: %s", input.Title)
+
+	err := db.QueryRow("INSERT INTO todos(title, user_id, done) VALUES($1,$2,$3) RETURNING id", input.Title, input.UserID, false).Scan(&todo_id)
+	if err != nil {
+		log.Printf("Error - %s", err)
 	}
-	r.todos = append(r.todos, todo)
-	return todo, nil
+
+	log.Printf("Todo ID: %s", todo_id)
+	return todo_id, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	database.SetupDatabase()
+
 	return r.todos, nil
 }
 
