@@ -6,30 +6,45 @@ package graph
 import (
 	"app/graph/generated"
 	"app/graph/model"
-	"app/utils/database"
+	"app/usecase"
 	"context"
 	"log"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (string, error) {
-	var todo_id string
-	db, _ := database.SetupDatabase()
+func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+	todo, err := usecase.CreateTodo(input.Title, false, input.UserID, ctx)
 
-	// log.Printf("Title: %s", input.Title)
-
-	err := db.QueryRow("INSERT INTO todos(title, user_id, done) VALUES($1,$2,$3) RETURNING id", input.Title, input.UserID, false).Scan(&todo_id)
 	if err != nil {
-		log.Printf("Error - %s", err)
+		log.Fatal(err)
+		return nil, err
 	}
 
-	log.Printf("Todo ID: %s", todo_id)
-	return todo_id, nil
+	rTodo := &model.Todo{
+		ID:     todo.ID,
+		Title:  todo.Title,
+		Done:   todo.Done,
+		UserID: todo.UserID,
+	}
+
+	log.Printf("Todo ID: %d", todo.ID)
+	return rTodo, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	database.SetupDatabase()
+	todos, _ := usecase.QueryUser(1, ctx)
+	rTodos := []*model.Todo{}
 
-	return r.todos, nil
+	for _, todo := range todos {
+		rTodo := &model.Todo{
+			ID:     todo.ID,
+			Title:  todo.Title,
+			Done:   todo.Done,
+			UserID: todo.UserID,
+		}
+		rTodos = append(rTodos, rTodo)
+	}
+
+	return rTodos, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
