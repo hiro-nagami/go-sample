@@ -20,7 +20,7 @@ type Todo struct {
 	// Done holds the value of the "done" field.
 	Done bool `json:"done,omitempty"`
 	// UserID holds the value of the "user_id" field.
-	UserID string `json:"user_id,omitempty"`
+	UserID int `json:"user_id,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -30,9 +30,9 @@ func (*Todo) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case todo.FieldDone:
 			values[i] = new(sql.NullBool)
-		case todo.FieldID:
+		case todo.FieldID, todo.FieldUserID:
 			values[i] = new(sql.NullInt64)
-		case todo.FieldTitle, todo.FieldUserID:
+		case todo.FieldTitle:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Todo", columns[i])
@@ -68,10 +68,10 @@ func (t *Todo) assignValues(columns []string, values []interface{}) error {
 				t.Done = value.Bool
 			}
 		case todo.FieldUserID:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				t.UserID = value.String
+				t.UserID = int(value.Int64)
 			}
 		}
 	}
@@ -106,7 +106,7 @@ func (t *Todo) String() string {
 	builder.WriteString(", done=")
 	builder.WriteString(fmt.Sprintf("%v", t.Done))
 	builder.WriteString(", user_id=")
-	builder.WriteString(t.UserID)
+	builder.WriteString(fmt.Sprintf("%v", t.UserID))
 	builder.WriteByte(')')
 	return builder.String()
 }

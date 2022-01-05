@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "title", Type: field.TypeString, Default: ""},
 		{Name: "done", Type: field.TypeBool, Default: false},
-		{Name: "user_id", Type: field.TypeString},
+		{Name: "user_id", Type: field.TypeInt},
 	}
 	// TodosTable holds the schema information for the "todos" table.
 	TodosTable = &schema.Table{

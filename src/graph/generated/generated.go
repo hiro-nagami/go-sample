@@ -233,7 +233,7 @@ type Query {
 
 input NewTodo {
   title: String!
-  userId: String!
+  userId: Int!
 }
 
 type Mutation {
@@ -1816,7 +1816,7 @@ func (ec *executionContext) unmarshalInputNewTodo(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userId"))
-			it.UserID, err = ec.unmarshalNString2string(ctx, v)
+			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
