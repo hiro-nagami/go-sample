@@ -34,7 +34,8 @@ type TodoMutation struct {
 	id            *int
 	title         *string
 	_done         *bool
-	user_id       *string
+	user_id       *int
+	adduser_id    *int
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Todo, error)
@@ -199,12 +200,13 @@ func (m *TodoMutation) ResetDone() {
 }
 
 // SetUserID sets the "user_id" field.
-func (m *TodoMutation) SetUserID(s string) {
-	m.user_id = &s
+func (m *TodoMutation) SetUserID(i int) {
+	m.user_id = &i
+	m.adduser_id = nil
 }
 
 // UserID returns the value of the "user_id" field in the mutation.
-func (m *TodoMutation) UserID() (r string, exists bool) {
+func (m *TodoMutation) UserID() (r int, exists bool) {
 	v := m.user_id
 	if v == nil {
 		return
@@ -215,7 +217,7 @@ func (m *TodoMutation) UserID() (r string, exists bool) {
 // OldUserID returns the old "user_id" field's value of the Todo entity.
 // If the Todo object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TodoMutation) OldUserID(ctx context.Context) (v string, err error) {
+func (m *TodoMutation) OldUserID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldUserID is only allowed on UpdateOne operations")
 	}
@@ -229,9 +231,28 @@ func (m *TodoMutation) OldUserID(ctx context.Context) (v string, err error) {
 	return oldValue.UserID, nil
 }
 
+// AddUserID adds i to the "user_id" field.
+func (m *TodoMutation) AddUserID(i int) {
+	if m.adduser_id != nil {
+		*m.adduser_id += i
+	} else {
+		m.adduser_id = &i
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *TodoMutation) AddedUserID() (r int, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetUserID resets all changes to the "user_id" field.
 func (m *TodoMutation) ResetUserID() {
 	m.user_id = nil
+	m.adduser_id = nil
 }
 
 // Where appends a list predicates to the TodoMutation builder.
@@ -316,7 +337,7 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 		m.SetDone(v)
 		return nil
 	case todo.FieldUserID:
-		v, ok := value.(string)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -329,13 +350,21 @@ func (m *TodoMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *TodoMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.adduser_id != nil {
+		fields = append(fields, todo.FieldUserID)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *TodoMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case todo.FieldUserID:
+		return m.AddedUserID()
+	}
 	return nil, false
 }
 
@@ -344,6 +373,13 @@ func (m *TodoMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *TodoMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case todo.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Todo numeric field %s", name)
 }

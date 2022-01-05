@@ -55,8 +55,15 @@ func (tu *TodoUpdate) SetNillableDone(b *bool) *TodoUpdate {
 }
 
 // SetUserID sets the "user_id" field.
-func (tu *TodoUpdate) SetUserID(s string) *TodoUpdate {
-	tu.mutation.SetUserID(s)
+func (tu *TodoUpdate) SetUserID(i int) *TodoUpdate {
+	tu.mutation.ResetUserID()
+	tu.mutation.SetUserID(i)
+	return tu
+}
+
+// AddUserID adds i to the "user_id" field.
+func (tu *TodoUpdate) AddUserID(i int) *TodoUpdate {
+	tu.mutation.AddUserID(i)
 	return tu
 }
 
@@ -153,7 +160,14 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.UserID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: todo.FieldUserID,
+		})
+	}
+	if value, ok := tu.mutation.AddedUserID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: todo.FieldUserID,
 		})
@@ -206,8 +220,15 @@ func (tuo *TodoUpdateOne) SetNillableDone(b *bool) *TodoUpdateOne {
 }
 
 // SetUserID sets the "user_id" field.
-func (tuo *TodoUpdateOne) SetUserID(s string) *TodoUpdateOne {
-	tuo.mutation.SetUserID(s)
+func (tuo *TodoUpdateOne) SetUserID(i int) *TodoUpdateOne {
+	tuo.mutation.ResetUserID()
+	tuo.mutation.SetUserID(i)
+	return tuo
+}
+
+// AddUserID adds i to the "user_id" field.
+func (tuo *TodoUpdateOne) AddUserID(i int) *TodoUpdateOne {
+	tuo.mutation.AddUserID(i)
 	return tuo
 }
 
@@ -328,7 +349,14 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 	}
 	if value, ok := tuo.mutation.UserID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: todo.FieldUserID,
+		})
+	}
+	if value, ok := tuo.mutation.AddedUserID(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: todo.FieldUserID,
 		})
