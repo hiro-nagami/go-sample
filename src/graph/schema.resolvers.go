@@ -7,12 +7,20 @@ import (
 	"app/graph/generated"
 	"app/graph/model"
 	"app/usecase"
+	"app/utils/database"
 	"context"
 	"log"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo, err := usecase.CreateTodo(input.Title, false, input.UserID, ctx)
+	client, err := database.GetEntClient()
+
+	if err != nil {
+		return nil, err
+	}
+
+	todo, err := usecase.CreateTodo(input.Title, false, input.UserID, ctx, client)
+	defer client.Close()
 
 	if err != nil {
 		log.Fatal(err)
@@ -27,11 +35,20 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	}
 
 	log.Printf("Todo ID: %d", todo.ID)
+
 	return rTodo, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	todos, _ := usecase.QueryUser(1, ctx)
+	client, err := database.GetEntClient()
+
+	if err != nil {
+		return nil, err
+	}
+
+	todos, _ := usecase.QueryTodos(1, ctx, client)
+	defer client.Close()
+
 	rTodos := []*model.Todo{}
 
 	for _, todo := range todos {

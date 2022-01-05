@@ -20,7 +20,5 @@ func GetEntClient() (*ent.Client, error) {
 		fmt.Println(err)
 	}
 
-	defer client.Close()
-
 	return client, err
 }
