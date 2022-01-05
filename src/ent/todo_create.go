@@ -48,8 +48,8 @@ func (tc *TodoCreate) SetNillableDone(b *bool) *TodoCreate {
 }
 
 // SetUserID sets the "user_id" field.
-func (tc *TodoCreate) SetUserID(s string) *TodoCreate {
-	tc.mutation.SetUserID(s)
+func (tc *TodoCreate) SetUserID(i int) *TodoCreate {
+	tc.mutation.SetUserID(i)
 	return tc
 }
 
@@ -207,7 +207,7 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := tc.mutation.UserID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeInt,
 			Value:  value,
 			Column: todo.FieldUserID,
 		})

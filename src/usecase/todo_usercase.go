@@ -3,15 +3,11 @@ package usecase
 import (
 	"app/ent"
 	"app/ent/todo"
-	"app/utils/database"
 	"context"
 	"fmt"
-	"log"
 )
 
-func CreateTodo(title string, done bool, userId string, ctx context.Context) (*ent.Todo, error) {
-	client, err := database.GetEntClient()
-
+func CreateTodo(title string, done bool, userId int, ctx context.Context, client *ent.Client) (*ent.Todo, error) {
 	todo, err := client.Todo.
 		Create().
 		SetTitle(title).
@@ -22,22 +18,18 @@ func CreateTodo(title string, done bool, userId string, ctx context.Context) (*e
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
 	}
-	log.Println("user was created: ", todo)
+
 	return todo, nil
 }
 
-func QueryUser(id int, ctx context.Context) ([]*ent.Todo, error) {
-	client, err := database.GetEntClient()
-
+func QueryTodos(id int, ctx context.Context, client *ent.Client) ([]*ent.Todo, error) {
 	todos, err := client.Todo.
 		Query().
 		Where(todo.IDEQ(id)).
-		// `Only` fails if no user found,
-		// or more than 1 user returned.
 		All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
-	log.Println("user returned: ", todos)
+
 	return todos, nil
 }
