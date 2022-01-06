@@ -6,21 +6,16 @@ package graph
 import (
 	"app/graph/generated"
 	"app/graph/model"
+	"app/repository"
 	"app/usecase"
-	"app/utils/database"
 	"context"
 	"log"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	client, err := database.GetEntClient()
+	usecase := usecase.NewTodoUseCase(repository.NewTodoRepository())
 
-	if err != nil {
-		return nil, err
-	}
-
-	todo, err := usecase.CreateTodo(input.Title, false, input.UserID, ctx, client)
-	defer client.Close()
+	todo, err := usecase.CreateTodo(input.Title, false, input.UserID)
 
 	if err != nil {
 		log.Fatal(err)
@@ -40,14 +35,9 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	client, err := database.GetEntClient()
+	usecase := usecase.NewTodoUseCase(repository.NewTodoRepository())
 
-	if err != nil {
-		return nil, err
-	}
-
-	todos, _ := usecase.QueryTodos(1, ctx, client)
-	defer client.Close()
+	todos, _ := usecase.QueryTodos(1)
 
 	rTodos := []*model.Todo{}
 

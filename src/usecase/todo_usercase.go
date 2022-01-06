@@ -2,18 +2,22 @@ package usecase
 
 import (
 	"app/ent"
-	"app/ent/todo"
-	"context"
+	"app/repository"
 	"fmt"
 )
 
-func CreateTodo(title string, done bool, userId int, ctx context.Context, client *ent.Client) (*ent.Todo, error) {
-	todo, err := client.Todo.
-		Create().
-		SetTitle(title).
-		SetDone(done).
-		SetUserID(userId).
-		Save(ctx)
+type TodoUseCase struct {
+	repo repository.TodoRepository
+}
+
+func NewTodoUseCase(repo repository.TodoRepository) *TodoUseCase {
+	return &TodoUseCase{
+		repo: repo,
+	}
+}
+
+func (usecase *TodoUseCase) CreateTodo(title string, done bool, userId int) (*ent.Todo, error) {
+	todo, err := usecase.repo.CreateTodo(title, done, userId)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
@@ -22,11 +26,9 @@ func CreateTodo(title string, done bool, userId int, ctx context.Context, client
 	return todo, nil
 }
 
-func QueryTodos(id int, ctx context.Context, client *ent.Client) ([]*ent.Todo, error) {
-	todos, err := client.Todo.
-		Query().
-		Where(todo.IDEQ(id)).
-		All(ctx)
+func (usecase *TodoUseCase) QueryTodos(id int) ([]*ent.Todo, error) {
+	todos, err := usecase.repo.QueryTodos(id)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
