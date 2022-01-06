@@ -7,6 +7,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type Database interface {
+	GetEntClient()
+}
+
 func GetEntClient() (*ent.Client, error) {
 	var host string = utils.MustGet("POSTGRES_HOST")
 	var user string = utils.MustGet("POSTGRES_USER")
