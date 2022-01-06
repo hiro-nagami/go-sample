@@ -1,26 +1,18 @@
-package test
+package usecase
 
 import (
+	"app/repository"
 	"app/usecase"
-	"app/utils/database"
-	"context"
 	"testing"
 )
 
 func TestTodoUseCase(t *testing.T) {
 
 	t.Run("Add Todo", func(t *testing.T) {
-		client, err := database.GetEntClient()
+		usecase := usecase.NewTodoUseCase(repository.NewTodoRepository())
+		usecase.CreateTodo("test", false, 1)
 
-		if err != nil {
-			t.Fatal("Failed to create todo")
-		}
-
-		ctx := context.Background()
-		usecase.CreateTodo("test", false, 1, ctx, client)
-		defer client.Close()
-
-		todos, err := usecase.QueryTodos(1, ctx, client)
+		todos, err := usecase.QueryTodos(1)
 
 		if err != nil {
 			t.Fatal("Couldn't create todo", err)

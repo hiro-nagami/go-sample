@@ -8,4 +8,4 @@
 
 
 ### Testing
-1. Run `docker-compose run --rm server go test -v ./test`
+1. Run `docker-compose run --rm server go test -v app/test/...`
