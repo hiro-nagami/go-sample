@@ -1,10 +1,35 @@
 package usecase
 
 import (
+	"app/ent"
 	"app/repository"
 	"app/usecase"
 	"testing"
 )
+
+type dummyTodoRepository struct {
+	todos []*ent.Todo
+}
+
+func NewTodoRepository() repository.TodoRepository {
+	return &dummyTodoRepository{}
+}
+
+func (repo *dummyTodoRepository) CreateTodo(title string, done bool, userId int) (*ent.Todo, error) {
+	todo := &ent.Todo{
+		ID:     1,
+		Title:  title,
+		Done:   done,
+		UserID: userId,
+	}
+	repo.todos = append(repo.todos, todo)
+
+	return todo, nil
+}
+
+func (repo *dummyTodoRepository) QueryTodos(id int) ([]*ent.Todo, error) {
+	return repo.todos, nil
+}
 
 func TestTodoUseCase(t *testing.T) {
 
