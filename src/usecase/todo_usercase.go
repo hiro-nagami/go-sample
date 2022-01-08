@@ -44,3 +44,13 @@ func (usecase *TodoUseCase) QueryTodos(id int) ([]*ent.Todo, error) {
 
 	return todos, nil
 }
+
+func (usecase *TodoUseCase) QueryTodosByUserID(userId int) ([]*ent.Todo, error) {
+	todos, err := usecase.repo.QueryTodosByUserID(userId)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed querying user: %w", err)
+	}
+
+	return todos, nil
+}

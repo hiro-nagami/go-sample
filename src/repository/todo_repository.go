@@ -11,6 +11,7 @@ import (
 type TodoRepository interface {
 	CreateTodo(title string, done bool, userId int) (*ent.Todo, error)
 	QueryTodos(id int) ([]*ent.Todo, error)
+	QueryTodosByUserID(userId int) ([]*ent.Todo, error)
 }
 
 type todoRepository struct {
@@ -54,6 +55,22 @@ func (repo *todoRepository) QueryTodos(id int) ([]*ent.Todo, error) {
 	todos, err := client.Todo.
 		Query().
 		Where(todo.IDEQ(id)).
+		All(context)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying user: %w", err)
+	}
+
+	defer repo.client.Close()
+	return todos, nil
+}
+
+func (repo *todoRepository) QueryTodosByUserID(userId int) ([]*ent.Todo, error) {
+	client, err := database.GetEntClient()
+	context := context.Background()
+
+	todos, err := client.Todo.
+		Query().
+		Where(todo.UserID(userId)).
 		All(context)
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
