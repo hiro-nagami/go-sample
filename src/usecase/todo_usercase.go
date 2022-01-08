@@ -17,6 +17,15 @@ func NewTodoUseCase(repo repository.TodoRepository) *TodoUseCase {
 }
 
 func (usecase *TodoUseCase) CreateTodo(title string, done bool, userId int) (*ent.Todo, error) {
+
+	if title == "" {
+		return nil, fmt.Errorf("%s", "Title is empty")
+	}
+
+	if userId <= 0 {
+		return nil, fmt.Errorf("%s", "User ID is wrong")
+	}
+
 	todo, err := usecase.repo.CreateTodo(title, done, userId)
 
 	if err != nil {
