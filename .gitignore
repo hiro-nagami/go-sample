@@ -1,4 +1,5 @@
 .env
 .idea
-src/graph/generated
-src/graph/model
+src/graph/generated/*
+src/graph/model/*
+src/proto/*
