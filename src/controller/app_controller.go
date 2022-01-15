@@ -1,6 +1,10 @@
 package controller
 
 import (
+	"app/graph"
+	"app/graph/generated"
+	"app/repository"
+	"app/usecase"
 	"app/utils"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-chi/chi/v5"
@@ -8,22 +12,27 @@ import (
 	"github.com/rs/cors"
 	"log"
 	"net/http"
-	"app/graph"
-	"app/graph/generated"
 )
 
 const defaultPort = "8080"
 
 type Server struct {
 	handler http.Handler
-	path string
+	path    string
 }
 
 func NewGraphqlServer() *Server {
-	handler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	todoRepository := repository.NewTodoRepository()
+
+	todoUseCase := usecase.NewTodoUseCase(todoRepository)
+	resolver := &graph.Resolver{TodoUseCase: todoUseCase}
+	config := generated.Config{Resolvers: resolver}
+	schema := generated.NewExecutableSchema(config)
+
+	handler := handler.NewDefaultServer(schema)
 	return &Server{
 		handler: handler,
-		path: "/graph",
+		path:    "/graph",
 	}
 }
 
@@ -35,7 +44,7 @@ type AppController interface {
 type appController struct {
 	router *chi.Mux
 	server *Server
-	port string
+	port   string
 }
 
 func NewAppController() AppController {
@@ -55,10 +64,10 @@ func NewAppController() AppController {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}).Handler)
 
-	return &appController {
+	return &appController{
 		router: router,
 		server: nil,
-		port: port,
+		port:   port,
 	}
 }
 
