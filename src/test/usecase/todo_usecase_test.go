@@ -4,6 +4,7 @@ import (
 	"app/ent"
 	"app/repository"
 	"app/usecase"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
@@ -17,6 +18,11 @@ func NewDummyTodoRepository() repository.TodoRepository {
 		todos: []*ent.Todo{},
 		count: 0,
 	}
+}
+
+func NewTodoUseCase() *usecase.TodoUseCase {
+	r := NewDummyTodoRepository()
+	return usecase.NewTodoUseCase(r)
 }
 
 func (repo *dummyTodoRepository) CreateTodo(title string, done bool, userId int) (*ent.Todo, error) {
@@ -60,86 +66,44 @@ func (repo *dummyTodoRepository) QueryTodosByUserID(userId int) ([]*ent.Todo, er
 func TestTodoUseCase(t *testing.T) {
 
 	t.Run("Add Todo", func(t *testing.T) {
-		uc := usecase.NewTodoUseCase(NewDummyTodoRepository())
+		uc := NewTodoUseCase()
 		uc.CreateTodo("test1", false, 1)
 		uc.CreateTodo("test2", true, 1)
 
-		todos, err := uc.QueryTodos(2)
-
-		if err != nil {
-			t.Fatal("Couldn't create todo", err)
-		}
-
-		if len(todos) != 1 {
-			t.Fatal("Didn't match todos len")
-		}
-
-		todo := todos[0]
-
-		if todo.Title != "test2" {
-			t.Fatal("`Title` is wrong")
-		}
-
-		if todo.Done != true {
-			t.Fatal("`Done` is wrong")
-		}
-	})
-
-	t.Run("Add Todo", func(t *testing.T) {
-		uc := usecase.NewTodoUseCase(NewDummyTodoRepository())
-		uc.CreateTodo("test1", false, 1)
-		uc.CreateTodo("test2", false, 1)
-
 		todos, err := uc.QueryTodosByUserID(1)
 
-		if err != nil {
-			t.Fatal("Couldn't create todo", err)
-		}
+		require.Nil(t, err)
+		require.Equal(t, 2, len(todos))
+		require.Equal(t, "test1", todos[0].Title)
+		require.Equal(t, false, todos[0].Done)
 
-		if len(todos) != 2 {
-			t.Fatal("Didn't match todos len")
-		}
-
-		todo := todos[0]
-
-		if todo.Title != "test1" {
-			t.Fatal("`Title` is wrong")
-		}
-
-		if todo.Done != false {
-			t.Fatal("`Done` is wrong")
-		}
+		require.Equal(t, "test2", todos[1].Title)
+		require.Equal(t, true, todos[1].Done)
 	})
 
-	t.Run("Failed to create todo by empty tilte", func(t *testing.T) {
-		uc := usecase.NewTodoUseCase(NewDummyTodoRepository())
+	t.Run("Failed to create todo by empty title", func(t *testing.T) {
+		uc := NewTodoUseCase()
 
 		todo, err := uc.CreateTodo("", false, 1)
 
-		if todo != nil || err == nil {
-			t.Fatal("UseCase couldn't classify invalid cases")
-		}
+		require.Nil(t, todo)
+		require.NotNil(t, err)
 
 		todos, err := uc.QueryTodos(1)
 
-		if len(todos) > 0 {
-			t.Fatal("`Title` is wrong")
-		}
+		require.Equal(t, 0, len(todos))
 	})
 
 	t.Run("Failed to create todo by invalid userid", func(t *testing.T) {
-		uc := usecase.NewTodoUseCase(NewDummyTodoRepository())
+		uc := NewTodoUseCase()
 
 		todo, err := uc.CreateTodo("test", false, -1)
 
-		if todo != nil || err == nil {
-			t.Fatal("UseCase couldn't classify invalid cases")
-		}
+		require.Nil(t, todo)
+		require.NotNil(t, err)
 
 		todos, err := uc.QueryTodos(1)
 
-		if len(todos) > 0 {
-			t.Fatal("`Title` is wrong")
-		}
+		require.Equal(t, 0, len(todos))
 	})
 }
