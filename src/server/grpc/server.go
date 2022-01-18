@@ -2,9 +2,8 @@ package grpc
 
 import (
 	pb "app/proto"
-	"app/server"
+	sv "app/server"
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -14,19 +13,60 @@ import (
 const defaultPort = "8080"
 
 type Server struct {
-	server  *grpc.Server
-	handler pb.GreeterServer
-	path    string
-	port    string
+	Server *grpc.Server
+	Path   string
+	Port   string
+	Helper *ServicesHelper
 }
 
-type GreeterService struct {
-	pb.UnimplementedGreeterServer
+type ServicesHelper struct {
+	services *sv.Services
 }
 
-func (s *GreeterService) SayHello(ctx context.Context, req *pb.HelloRequest) (*pb.HelloReply, error) {
-	return &pb.HelloReply{
-		Message: fmt.Sprintf("Hello gRPC, %s.\n", req.Name),
+func (s *Server) Inject(services *sv.Services) {
+	s.Helper = &ServicesHelper{
+		services: services,
+	}
+}
+
+func (h *ServicesHelper) CreateTodo(ctx context.Context, request *pb.CreateTodoRequest) (*pb.TodoResponse, error) {
+	newTodo, err := h.services.Todo.CreateTodo(request.Todo.Title, request.Todo.Done, int(request.Todo.UserId))
+
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	return &pb.TodoResponse{
+		Todo: &pb.Todo{
+			Id:     int32(newTodo.ID),
+			Title:  newTodo.Title,
+			Done:   newTodo.Done,
+			UserId: int32(newTodo.UserID),
+		},
+	}, nil
+}
+
+func (h *ServicesHelper) Todos(ctx context.Context, request *pb.TodosRequest) (*pb.TodosResponse, error) {
+	id := int(request.UserId)
+	fetched, err := h.services.Todo.QueryTodosByUserID(id)
+
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	todos := []*pb.Todo{}
+
+	for _, t := range fetched {
+		todos = append(todos, &pb.Todo{
+			Id:     int32(t.ID),
+			Title:  t.Title,
+			Done:   t.Done,
+			UserId: int32(t.UserID),
+		})
+	}
+
+	return &pb.TodosResponse{
+		Todos: todos,
 	}, nil
 }
 
@@ -36,20 +76,19 @@ func (s *Server) Serve() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	pb.RegisterGreeterServer(s.server, s.handler)
-	reflection.Register(s.server)
+	pb.RegisterTodoServiceServer(s.Server, s.Helper)
+	reflection.Register(s.Server)
 
-	log.Fatal(s.server.Serve(lis))
+	log.Fatal(s.Server.Serve(lis))
 }
 
-func NewServer() server.Server {
+func NewServer() sv.Server {
 	server := grpc.NewServer()
-	handler := &GreeterService{}
 
 	return &Server{
-		server:  server,
-		handler: handler,
-		path:    "/grpc",
-		port:    defaultPort,
+		Server: server,
+		Path:   "/grpc",
+		Port:   defaultPort,
+		Helper: nil,
 	}
 }

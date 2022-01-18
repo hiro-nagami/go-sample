@@ -1,14 +1,23 @@
 package main
 
 import (
-	"app/server"
+	"app/repository"
+	sv "app/server"
 	"app/server/grpc"
+	"app/usecase"
 )
 
 func main() {
-	var server server.Server
-	//server = graphql.NewServer()
-	server = grpc.NewServer()
+	services := &sv.Services{}
 
+	todo := &usecase.TodoUseCase{
+		Repo: repository.NewTodoRepository(),
+	}
+
+	services.Inject(todo)
+
+	var server sv.Server = grpc.NewServer()
+	//var server sv.Server = graphql.NewServer()
+	server.Inject(services)
 	server.Serve()
 }
