@@ -1,4 +1,19 @@
 ## Glang sample development
+1. Setup gRPC
+```shell
+$ brew install protobuf
+$ go get -u google.golang.org/grpc
+$ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
+$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+ ```
+
+2. Generate gRPC files
+```shell
+$ protoc --go_out=. --go_opt=paths=source_relative \
+         --go-grpc_out=. --go-grpc_opt=require_unimplemented_servers=false,\
+         paths=source_relative \
+         proto/helloworld.proto
+```
 
 ### Setup docker
 1. Run `script/setup.sh`

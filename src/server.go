@@ -1,10 +1,14 @@
 package main
 
-import "app/controller"
+import (
+	"app/server"
+	"app/server/grpc"
+)
 
 func main() {
-	app := controller.NewAppController()
-	server := controller.NewGraphqlServer()
-	app.Inject(server)
-	app.Serve()
+	var server server.Server
+	//server = graphql.NewServer()
+	server = grpc.NewServer()
+
+	server.Serve()
 }
