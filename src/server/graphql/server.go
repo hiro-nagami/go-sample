@@ -17,15 +17,28 @@ import (
 const defaultPort = "8080"
 
 type Server struct {
-	router  *chi.Mux
-	handler http.Handler
-	path    string
-	port    string
+	Router   *chi.Mux
+	Handler  http.Handler
+	Path     string
+	Port     string
+	Services *server.Services
+}
+
+func (s *Server) Inject(services *server.Services) {
+	s.Services = services
+}
+
+type Services struct {
+	Todo *usecase.TodoUseCase
 }
 
 func (s *Server) Serve() {
-	s.router.Handle(s.path, s.handler)
-	log.Fatal(http.ListenAndServe(":"+s.port, s.router))
+	s.Router.Handle(s.Path, s.Handler)
+	log.Fatal(http.ListenAndServe(":"+s.Path, s.Router))
+}
+
+func (s *Services) Inject(todo *usecase.TodoUseCase) {
+	s.Todo = todo
 }
 
 func NewRouter() *chi.Mux {
@@ -63,9 +76,10 @@ func NewServer() server.Server {
 	router := NewRouter()
 
 	return &Server{
-		router:  router,
-		handler: handler,
-		path:    "/graph",
-		port:    defaultPort,
+		Router:   router,
+		Handler:  handler,
+		Path:     "/graph",
+		Port:     defaultPort,
+		Services: nil,
 	}
 }

@@ -7,12 +7,12 @@ import (
 )
 
 type TodoUseCase struct {
-	repo repository.TodoRepository
+	Repo repository.TodoRepository
 }
 
 func NewTodoUseCase(repo repository.TodoRepository) *TodoUseCase {
 	return &TodoUseCase{
-		repo: repo,
+		Repo: repo,
 	}
 }
 
@@ -26,7 +26,7 @@ func (usecase *TodoUseCase) CreateTodo(title string, done bool, userId int) (*en
 		return nil, fmt.Errorf("%s", "User ID is wrong")
 	}
 
-	todo, err := usecase.repo.CreateTodo(title, done, userId)
+	todo, err := usecase.Repo.CreateTodo(title, done, userId)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed creating user: %w", err)
@@ -36,7 +36,7 @@ func (usecase *TodoUseCase) CreateTodo(title string, done bool, userId int) (*en
 }
 
 func (usecase *TodoUseCase) QueryTodos(id int) ([]*ent.Todo, error) {
-	todos, err := usecase.repo.QueryTodos(id)
+	todos, err := usecase.Repo.QueryTodos(id)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
@@ -46,7 +46,7 @@ func (usecase *TodoUseCase) QueryTodos(id int) ([]*ent.Todo, error) {
 }
 
 func (usecase *TodoUseCase) QueryTodosByUserID(userId int) ([]*ent.Todo, error) {
-	todos, err := usecase.repo.QueryTodosByUserID(userId)
+	todos, err := usecase.Repo.QueryTodosByUserID(userId)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)

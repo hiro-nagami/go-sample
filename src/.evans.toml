@@ -1,7 +1,7 @@
 [default]
-protoFile = ["proto/helloworld.proto"]
+protoFile = ["proto/todo_service.proto"]
 package = "proto"
-service = "Greeter"
+service = "TodoService"
 [server]
 host = "0.0.0.0"
 port = "8081"
