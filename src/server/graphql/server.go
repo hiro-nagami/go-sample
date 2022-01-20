@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
-	"log"
+	"net"
 	"net/http"
 )
 
@@ -32,9 +32,9 @@ type Services struct {
 	Todo *usecase.TodoUseCase
 }
 
-func (s *Server) Serve() {
+func (s *Server) Serve(lis net.Listener) error {
 	s.Router.Handle(s.Path, s.Handler)
-	log.Fatal(http.ListenAndServe(":"+s.Path, s.Router))
+	return http.ListenAndServe(":"+s.Path, s.Router)
 }
 
 func (s *Services) Inject(todo *usecase.TodoUseCase) {

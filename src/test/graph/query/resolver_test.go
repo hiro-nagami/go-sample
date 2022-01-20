@@ -17,13 +17,6 @@ type dummyTodoRepository struct {
 	count int
 }
 
-func NewDummyTodoRepository() repository.TodoRepository {
-	return &dummyTodoRepository{
-		todos: []*ent.Todo{},
-		count: 0,
-	}
-}
-
 func (repo *dummyTodoRepository) CreateTodo(title string, done bool, userId int) (*ent.Todo, error) {
 	repo.count++
 
@@ -63,7 +56,10 @@ func (repo *dummyTodoRepository) QueryTodosByUserID(userId int) ([]*ent.Todo, er
 }
 
 func NewTodoRepository() repository.TodoRepository {
-	return &dummyTodoRepository{}
+	return &dummyTodoRepository{
+		todos: []*ent.Todo{},
+		count: 0,
+	}
 }
 
 func NewTodoUseCase() *usecase.TodoUseCase {

@@ -7,8 +7,8 @@ import (
 	"app/usecase"
 )
 
-func main() {
-	services := &sv.Services{}
+func NewService() *sv.Services {
+	services := sv.Services{}
 
 	todo := &usecase.TodoUseCase{
 		Repo: repository.NewTodoRepository(),
@@ -16,8 +16,15 @@ func main() {
 
 	services.Inject(todo)
 
-	var server sv.Server = grpc.NewServer()
-	//var server sv.Server = graphql.NewServer()
-	server.Inject(services)
-	server.Serve()
+	return &services
+}
+
+func NewServer() sv.Server {
+	return grpc.NewServer()
+}
+
+func main() {
+	server := NewServer()
+	server.Inject(NewService())
+	server.Serve(nil)
 }
