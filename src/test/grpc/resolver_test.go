@@ -1,11 +1,14 @@
 package grpc
 
 import (
+	pb "app/proto"
 	"context"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 	"log"
 	"net"
 	"testing"
+	grpcServer "app/server/grpc"
 )
 
 const bufSize = 1024 * 1024
@@ -14,10 +17,10 @@ var lis *bufconn.Listener
 
 func init() {
 	lis = bufconn.Listen(bufSize)
-	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
+	server := grpcServer.NewServer()
+
 	go func() {
-		if err := s.Serve(lis); err != nil {
+		if err := server..Serve(lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
 		}
 	}()
