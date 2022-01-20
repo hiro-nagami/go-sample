@@ -70,7 +70,7 @@ func (h *ServicesHelper) Todos(ctx context.Context, request *pb.TodosRequest) (*
 	}, nil
 }
 
-func (s *Server) Serve(lis net.Listener) {
+func (s *Server) Serve(lis net.Listener) error {
 	var err error = nil
 
 	if lis == nil {
@@ -78,13 +78,13 @@ func (s *Server) Serve(lis net.Listener) {
 	}
 
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		return err
 	}
 
 	pb.RegisterTodoServiceServer(s.Server, s.Helper)
 	reflection.Register(s.Server)
 
-	log.Fatal(s.Server.Serve(lis))
+	return s.Server.Serve(lis)
 }
 
 func NewServer() sv.Server {

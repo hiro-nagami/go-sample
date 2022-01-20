@@ -2,10 +2,11 @@ package server
 
 import (
 	"app/usecase"
+	"net"
 )
 
 type Server interface {
-	Serve()
+	Serve(lis net.Listener) error
 	Inject(services *Services)
 }
 

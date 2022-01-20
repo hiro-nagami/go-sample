@@ -26,5 +26,5 @@ func NewServer() sv.Server {
 func main() {
 	server := NewServer()
 	server.Inject(NewService())
-	server.Serve()
+	server.Serve(nil)
 }
