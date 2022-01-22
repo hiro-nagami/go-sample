@@ -2,4 +2,4 @@
 .idea
 src/graph/generated/*
 src/graph/model/*
-src/proto/*
+src/proto/*.pb.go
