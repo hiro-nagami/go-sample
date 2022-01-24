@@ -3,3 +3,4 @@
 src/graph/generated/*
 src/graph/model/*
 src/proto/*.pb.go
+src/
