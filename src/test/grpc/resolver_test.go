@@ -86,14 +86,55 @@ func NewTodoRepository() repository.TodoRepository {
 	}
 }
 
+type dummyUserRepository struct {
+	users []*ent.User
+	count int
+}
+
+func (repo *dummyUserRepository) CreateUser(name string, sex int) (*ent.User, error) {
+	repo.count++
+
+	todo := &ent.User{
+		ID:   repo.count,
+		Name: name,
+		Sex:  sex,
+	}
+	repo.users = append(repo.users, todo)
+
+	return todo, nil
+}
+
+func (repo *dummyUserRepository) QueryUsers(id int) ([]*ent.User, error) {
+	users := []*ent.User{}
+
+	for i := range repo.users {
+		if repo.users[i].ID == id {
+			users = append(users, repo.users[i])
+		}
+	}
+
+	return users, nil
+}
+
+func NewUserRepository() repository.UserRepository {
+	return &dummyUserRepository{
+		users: []*ent.User{},
+		count: 0,
+	}
+}
+
 func NewService() *sv.Services {
 	services := sv.Services{}
 
 	todo := &usecase.TodoUseCase{
 		Repo: NewTodoRepository(),
 	}
+	user := &usecase.UserUseCase{
+		Repo: NewUserRepository(),
+	}
 
-	services.Inject(todo)
+	services.InjectTodo(todo)
+	services.InjectUser(user)
 
 	return &services
 }

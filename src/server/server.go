@@ -12,8 +12,13 @@ type Server interface {
 
 type Services struct {
 	Todo *usecase.TodoUseCase
+	User *usecase.UserUseCase
 }
 
-func (s *Services) Inject(todo *usecase.TodoUseCase) {
+func (s *Services) InjectTodo(todo *usecase.TodoUseCase) {
 	s.Todo = todo
+}
+
+func (s *Services) InjectUser(user *usecase.UserUseCase) {
+	s.User = user
 }

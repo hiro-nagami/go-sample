@@ -14,7 +14,7 @@ func NewService() *sv.Services {
 		Repo: repository.NewTodoRepository(),
 	}
 
-	services.Inject(todo)
+	services.InjectTodo(todo)
 
 	return &services
 }

@@ -23,7 +23,7 @@ message UserResponse {
 // The response message containing the greetings
 
 message NewUser {
-  string title = 1;
+  string name = 1;
   int32 sex = 3;
 }
 

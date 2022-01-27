@@ -25,10 +25,16 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 	return uc
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uc *UserCreate) SetNillableName(s *string) *UserCreate {
-	if s != nil {
-		uc.SetName(*s)
+// SetSex sets the "sex" field.
+func (uc *UserCreate) SetSex(i int) *UserCreate {
+	uc.mutation.SetSex(i)
+	return uc
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (uc *UserCreate) SetNillableSex(i *int) *UserCreate {
+	if i != nil {
+		uc.SetSex(*i)
 	}
 	return uc
 }
@@ -110,9 +116,9 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (uc *UserCreate) defaults() {
-	if _, ok := uc.mutation.Name(); !ok {
-		v := user.DefaultName
-		uc.mutation.SetName(v)
+	if _, ok := uc.mutation.Sex(); !ok {
+		v := user.DefaultSex
+		uc.mutation.SetSex(v)
 	}
 }
 
@@ -120,6 +126,9 @@ func (uc *UserCreate) defaults() {
 func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
+	}
+	if _, ok := uc.mutation.Sex(); !ok {
+		return &ValidationError{Name: "sex", err: errors.New(`ent: missing required field "sex"`)}
 	}
 	if v, ok := uc.mutation.ID(); ok {
 		if err := user.IDValidator(v); err != nil {
@@ -166,6 +175,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldName,
 		})
 		_node.Name = value
+	}
+	if value, ok := uc.mutation.Sex(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldSex,
+		})
+		_node.Sex = value
 	}
 	return _node, _spec
 }

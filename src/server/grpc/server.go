@@ -70,6 +70,22 @@ func (h *ServicesHelper) Todos(ctx context.Context, request *pb.TodosRequest) (*
 	}, nil
 }
 
+func (h *ServicesHelper) CreateUser(ctx context.Context, request *pb.CreateUserRequest) (*pb.UserResponse, error) {
+	newUser, err := h.services.User.CreateUser(request.User.Name, int(request.User.Sex))
+
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	return &pb.UserResponse{
+		User: &pb.User{
+			Id:   int32(newUser.ID),
+			Name: newUser.Name,
+			Sex:  int32(newUser.Sex),
+		},
+	}, nil
+}
+
 func (s *Server) Serve(lis net.Listener) error {
 	var err error = nil
 
@@ -82,6 +98,7 @@ func (s *Server) Serve(lis net.Listener) error {
 	}
 
 	pb.RegisterTodoServiceServer(s.Server, s.Helper)
+	pb.RegisterUserServiceServer(s.Server, s.Helper)
 	reflection.Register(s.Server)
 
 	return s.Server.Serve(lis)
