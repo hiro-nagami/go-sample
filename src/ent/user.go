@@ -17,6 +17,8 @@ type User struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Sex holds the value of the "sex" field.
+	Sex int `json:"sex,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -24,7 +26,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
+		case user.FieldID, user.FieldSex:
 			values[i] = new(sql.NullInt64)
 		case user.FieldName:
 			values[i] = new(sql.NullString)
@@ -54,6 +56,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				u.Name = value.String
+			}
+		case user.FieldSex:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sex", values[i])
+			} else if value.Valid {
+				u.Sex = int(value.Int64)
 			}
 		}
 	}
@@ -85,6 +93,8 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", u.ID))
 	builder.WriteString(", name=")
 	builder.WriteString(u.Name)
+	builder.WriteString(", sex=")
+	builder.WriteString(fmt.Sprintf("%v", u.Sex))
 	builder.WriteByte(')')
 	return builder.String()
 }

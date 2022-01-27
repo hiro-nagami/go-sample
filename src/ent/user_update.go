@@ -32,11 +32,24 @@ func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	return uu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableName(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetName(*s)
+// SetSex sets the "sex" field.
+func (uu *UserUpdate) SetSex(i int) *UserUpdate {
+	uu.mutation.ResetSex()
+	uu.mutation.SetSex(i)
+	return uu
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableSex(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetSex(*i)
 	}
+	return uu
+}
+
+// AddSex adds i to the "sex" field.
+func (uu *UserUpdate) AddSex(i int) *UserUpdate {
+	uu.mutation.AddSex(i)
 	return uu
 }
 
@@ -124,6 +137,20 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldName,
 		})
 	}
+	if value, ok := uu.mutation.Sex(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldSex,
+		})
+	}
+	if value, ok := uu.mutation.AddedSex(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldSex,
+		})
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -149,11 +176,24 @@ func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableName(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetName(*s)
+// SetSex sets the "sex" field.
+func (uuo *UserUpdateOne) SetSex(i int) *UserUpdateOne {
+	uuo.mutation.ResetSex()
+	uuo.mutation.SetSex(i)
+	return uuo
+}
+
+// SetNillableSex sets the "sex" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableSex(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetSex(*i)
 	}
+	return uuo
+}
+
+// AddSex adds i to the "sex" field.
+func (uuo *UserUpdateOne) AddSex(i int) *UserUpdateOne {
+	uuo.mutation.AddSex(i)
 	return uuo
 }
 
@@ -263,6 +303,20 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: user.FieldName,
+		})
+	}
+	if value, ok := uuo.mutation.Sex(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldSex,
+		})
+	}
+	if value, ok := uuo.mutation.AddedSex(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeInt,
+			Value:  value,
+			Column: user.FieldSex,
 		})
 	}
 	_node = &User{config: uuo.config}
