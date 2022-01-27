@@ -94,14 +94,14 @@ type dummyUserRepository struct {
 func (repo *dummyUserRepository) CreateUser(name string, sex int) (*ent.User, error) {
 	repo.count++
 
-	todo := &ent.User{
+	user := &ent.User{
 		ID:   repo.count,
 		Name: name,
 		Sex:  sex,
 	}
-	repo.users = append(repo.users, todo)
+	repo.users = append(repo.users, user)
 
-	return todo, nil
+	return user, nil
 }
 
 func (repo *dummyUserRepository) QueryUsers(id int) ([]*ent.User, error) {
