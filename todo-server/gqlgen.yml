@@ -2,7 +2,7 @@
 schema:
   - graph/*.graphqls
 
-# Where should the generated server code go?
+# Where should the generated todo-server code go?
 exec:
   filename: graph/generated/generated.go
   package: generated
