@@ -13,32 +13,32 @@ services:
       - '5050:5432'
     volumes:
       - /var/lib/postgresql/data
-      - ./src/db-init:/docker-entrypoint-initdb.d/
+      - ./todo-server/db-init:/docker-entrypoint-initdb.d/
   server:
     build:
-      context: ./src
+      context: todo-server
       dockerfile: Dockerfile
     depends_on:
       - postgres
     ports:
       - '0.0.0.0:8081:8080'
     volumes:
-      - ./src:/app
+      - ./todo-server:/app
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
-    command: go run server.go
+    command: go run main.go
   graphql-playground-server:
     build:
-      context: ./graphql-playground-src
+      context: ./graphql-playground-server
       dockerfile: Dockerfile
     ports:
       - '0.0.0.0:8082:8080'
     volumes:
-      - ./graphql-playground-src:/app
+      - ./graphql-playground-server:/app
     links:
       - server
   pgadmin:

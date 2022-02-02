@@ -1,6 +1,6 @@
 .env
 .idea
-src/graph/generated/*
-src/graph/model/*
-src/proto/*.pb.go
+server/graph/generated/*
+server/graph/model/*
+server/proto/*.pb.go
 
