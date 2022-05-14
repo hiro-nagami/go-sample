@@ -2,7 +2,6 @@ package server
 
 import (
 	"app/repository"
-	"app/server/grpc"
 	"app/usecase"
 	"net"
 )
@@ -35,8 +34,4 @@ func NewService() *Services {
 	services.InjectTodo(todo)
 
 	return &services
-}
-
-func NewServer() Server {
-	return grpc.NewServer()
 }

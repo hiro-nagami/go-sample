@@ -5,6 +5,7 @@ import (
 	"app/utils"
 	"fmt"
 	_ "github.com/lib/pq"
+	"golang.org/x/net/context"
 )
 
 type Database interface {
@@ -23,6 +24,11 @@ func GetEntClient() (*ent.Client, error) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	if err = client.Schema.Create(context.Background()); err != nil {
+		fmt.Println(err)
+	}
+
 
 	return client, err
 }

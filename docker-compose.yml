@@ -13,7 +13,9 @@ services:
       - '5050:5432'
     volumes:
       - /var/lib/postgresql/data
-      - ./todo-server/db-init:/docker-entrypoint-initdb.d/
+      # - ./todo-server/db-init:/docker-entrypoint-initdb.d/
+    networks:
+      - default
   server:
     build:
       context: todo-server
@@ -31,6 +33,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PORT: ${PORT}
     command: go run main.go
+    networks:
+      - default
+      - sample-shared
   graphql-playground-server:
     build:
       context: ./graphql-playground-server
@@ -41,6 +46,8 @@ services:
       - ./graphql-playground-server:/app
     links:
       - server
+    networks:
+      - default
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -51,3 +58,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
     depends_on:
       - postgres
+    networks:
+      - default
+networks:
+  sample-shared:
+    external: true
