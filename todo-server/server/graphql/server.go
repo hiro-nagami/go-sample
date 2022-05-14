@@ -34,7 +34,7 @@ type Services struct {
 
 func (s *Server) Serve(lis net.Listener) error {
 	s.Router.Handle(s.Path, s.Handler)
-	return http.ListenAndServe(":"+s.Path, s.Router)
+	return http.ListenAndServe(":"+s.Port, s.Router)
 }
 
 func (s *Services) Inject(todo *usecase.TodoUseCase) {
